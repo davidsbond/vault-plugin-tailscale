@@ -3,7 +3,7 @@ module github.com/davidsbond/vault-plugin-tailscale
 go 1.17
 
 require (
-	github.com/davidsbond/tailscale-client-go v1.0.0
+	github.com/davidsbond/tailscale-client-go v1.1.0
 	github.com/hashicorp/go-hclog v1.1.0
 	github.com/hashicorp/vault/api v1.3.1
 	github.com/hashicorp/vault/sdk v0.3.0
