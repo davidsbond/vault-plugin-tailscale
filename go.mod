@@ -3,7 +3,7 @@ module github.com/davidsbond/vault-plugin-tailscale
 go 1.17
 
 require (
-	github.com/davidsbond/tailscale-client-go v1.3.0
+	github.com/davidsbond/tailscale-client-go v1.3.1
 	github.com/hashicorp/go-hclog v1.2.0
 	github.com/hashicorp/vault/api v1.5.0
 	github.com/hashicorp/vault/sdk v0.4.1
@@ -48,7 +48,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/ryanuber/go-glob v1.0.0 // indirect
-	github.com/tailscale/hujson v0.0.0-20211215203138-ffd971c5f362 // indirect
+	github.com/tailscale/hujson v0.0.0-20220506213045-af5ed07155e5 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97 // indirect
 	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110 // indirect
