@@ -5,8 +5,8 @@ go 1.17
 require (
 	github.com/davidsbond/tailscale-client-go v1.3.1
 	github.com/hashicorp/go-hclog v1.2.1
-	github.com/hashicorp/vault/api v1.7.1
-	github.com/hashicorp/vault/sdk v0.5.0
+	github.com/hashicorp/vault/api v1.7.2
+	github.com/hashicorp/vault/sdk v0.5.1
 	github.com/stretchr/testify v1.7.2
 )
 
