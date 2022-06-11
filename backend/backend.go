@@ -26,14 +26,15 @@ type (
 )
 
 const (
-	backendHelp             = "The Tailscale backend is used to generate Tailscale authentication keys for a configured Tailnet"
-	readKeyDescription      = "Generate a single-use authentication key for a device"
-	readConfigDescription   = "Read the current Tailscale backend configuration"
-	updateConfigDescription = "Update the Tailscale backend configuration"
-	apiKeyDescription       = "The API key to use for authenticating with the Tailscale API"
-	tailnetDescription      = "The name of the Tailscale Tailnet"
-	tagsDescription         = "Tags to apply to the device that uses the authentication key"
-	apiUrlDescription       = "The URL of the Tailscale API"
+	backendHelp              = "The Tailscale backend is used to generate Tailscale authentication keys for a configured Tailnet"
+	readKeyDescription       = "Generate a single-use authentication key for a device"
+	readConfigDescription    = "Read the current Tailscale backend configuration"
+	updateConfigDescription  = "Update the Tailscale backend configuration"
+	apiKeyDescription        = "The API key to use for authenticating with the Tailscale API"
+	tailnetDescription       = "The name of the Tailscale Tailnet"
+	tagsDescription          = "Tags to apply to the device that uses the authentication key"
+	preauthorizedDescription = "If true, machines added to the tailnet with this key will not required authorization"
+	apiUrlDescription        = "The URL of the Tailscale API"
 )
 
 // Create a new logical.Backend implementation that can generate authentication keys for Tailscale devices.
@@ -49,6 +50,10 @@ func Create(ctx context.Context, config *logical.BackendConfig) (logical.Backend
 					"tags": {
 						Type:        framework.TypeStringSlice,
 						Description: tagsDescription,
+					},
+					"preauthorized": {
+						Type:        framework.TypeBool,
+						Description: preauthorizedDescription,
 					},
 				},
 				Operations: map[logical.Operation]framework.OperationHandler{
@@ -116,6 +121,7 @@ func (b *Backend) GenerateKey(ctx context.Context, request *logical.Request, dat
 
 	var capabilities tailscale.KeyCapabilities
 	capabilities.Devices.Create.Tags = data.Get("tags").([]string)
+	capabilities.Devices.Create.Preauthorized = data.Get("preauthorized").(bool)
 
 	key, err := client.CreateKey(ctx, capabilities)
 	if err != nil {
@@ -124,12 +130,13 @@ func (b *Backend) GenerateKey(ctx context.Context, request *logical.Request, dat
 
 	return &logical.Response{
 		Data: map[string]interface{}{
-			"id":        key.ID,
-			"key":       key.Key,
-			"expires":   key.Expires,
-			"tags":      key.Capabilities.Devices.Create.Tags,
-			"reusable":  key.Capabilities.Devices.Create.Reusable,
-			"ephemeral": key.Capabilities.Devices.Create.Ephemeral,
+			"id":            key.ID,
+			"key":           key.Key,
+			"expires":       key.Expires,
+			"tags":          key.Capabilities.Devices.Create.Tags,
+			"reusable":      key.Capabilities.Devices.Create.Reusable,
+			"ephemeral":     key.Capabilities.Devices.Create.Ephemeral,
+			"preauthorized": key.Capabilities.Devices.Create.Preauthorized,
 		},
 	}, nil
 }
