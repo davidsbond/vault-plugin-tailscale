@@ -23,6 +23,9 @@ func TestBackend_GenerateKey(t *testing.T) {
 		"tags": {
 			Type: framework.TypeStringSlice,
 		},
+		"preauthorized": {
+			Type: framework.TypeBool,
+		},
 	}
 
 	tt := []struct {
@@ -51,12 +54,13 @@ func TestBackend_GenerateKey(t *testing.T) {
 			},
 			APIStatusCode: http.StatusOK,
 			Expected: map[string]interface{}{
-				"ephemeral": false,
-				"expires":   time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC),
-				"id":        "12345",
-				"key":       "test",
-				"reusable":  false,
-				"tags":      []string(nil),
+				"ephemeral":     false,
+				"expires":       time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC),
+				"id":            "12345",
+				"key":           "test",
+				"reusable":      false,
+				"tags":          []string(nil),
+				"preauthorized": false,
 			},
 		},
 	}
