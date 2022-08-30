@@ -23,23 +23,8 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18.x
-
-      - name: Get cache paths
-        id: cache
-        run: |
-          echo "::set-output name=build::$(go env GOCACHE)"
-          echo "::set-output name=module::$(go env GOMODCACHE)"
-
-      - name: Set up cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ steps.cache.outputs.build }}
-            ${{ steps.cache.outputs.module }}
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
+          go-version-file: go.mod
+          cache: true
 
       - name: Run tests
         run: go test -race ./...
