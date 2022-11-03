@@ -7,7 +7,7 @@ require (
 	github.com/hashicorp/vault/api v1.8.2
 	github.com/hashicorp/vault/sdk v0.6.1
 	github.com/stretchr/testify v1.8.1
-	github.com/tailscale/tailscale-client-go v1.6.0
+	github.com/tailscale/tailscale-client-go v1.7.0
 )
 
 require (
