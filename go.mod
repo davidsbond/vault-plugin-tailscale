@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/hashicorp/go-hclog v1.4.0
-	github.com/hashicorp/vault/api v1.8.2
+	github.com/hashicorp/vault/api v1.8.3
 	github.com/hashicorp/vault/sdk v0.7.0
 	github.com/stretchr/testify v1.8.1
 	github.com/tailscale/tailscale-client-go v1.8.0
