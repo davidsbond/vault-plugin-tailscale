@@ -41,7 +41,7 @@ $ vault write tailscale/config tailnet=$TAILNET api_key=$API_KEY
 Success! Data written to: tailscale/config
 ```
 
-2. Generate keys using the Vault CLI.
+3. Generate keys using the Vault CLI.
 
 ```shell
 $ vault read tailscale/key
@@ -53,4 +53,32 @@ id           kMxzN47CNTRL
 key          secret-key-data
 reusable     false
 tags         <nil>
+```
+
+### Key Options
+
+The following key/value pairs can be added to the end of the `vault read` command to configure key properties:
+
+#### Tags
+
+Tags to apply to the device that uses the authentication key
+
+```
+vault read tailscale/key tags=something:somewhere
+```
+
+#### Preauthorized
+
+If true, machines added to the tailnet with this key will not required authorization
+
+```
+vault read tailscale/key preauthorized=true
+```
+
+#### Ephemeral
+
+If true, nodes created with this key will be removed after a period of inactivity or when they disconnect from the Tailnet
+
+```
+vault read tailscale/key ephemeral=true
 ```

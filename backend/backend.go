@@ -4,6 +4,7 @@ package backend
 
 import (
 	"context"
+	"errors"
 
 	"github.com/hashicorp/vault/sdk/framework"
 	"github.com/hashicorp/vault/sdk/logical"
@@ -35,6 +36,7 @@ const (
 	tagsDescription          = "Tags to apply to the device that uses the authentication key"
 	preauthorizedDescription = "If true, machines added to the tailnet with this key will not required authorization"
 	apiUrlDescription        = "The URL of the Tailscale API"
+	ephemeralDescription     = "If true, nodes created with this key will be removed after a period of inactivity or when they disconnect from the Tailnet"
 )
 
 // Create a new logical.Backend implementation that can generate authentication keys for Tailscale devices.
@@ -54,6 +56,10 @@ func Create(ctx context.Context, config *logical.BackendConfig) (logical.Backend
 					"preauthorized": {
 						Type:        framework.TypeBool,
 						Description: preauthorizedDescription,
+					},
+					"ephemeral": {
+						Type:        framework.TypeBool,
+						Description: ephemeralDescription,
 					},
 				},
 				Operations: map[logical.Operation]framework.OperationHandler{
@@ -122,6 +128,7 @@ func (b *Backend) GenerateKey(ctx context.Context, request *logical.Request, dat
 	var capabilities tailscale.KeyCapabilities
 	capabilities.Devices.Create.Tags = data.Get("tags").([]string)
 	capabilities.Devices.Create.Preauthorized = data.Get("preauthorized").(bool)
+	capabilities.Devices.Create.Ephemeral = data.Get("ephemeral").(bool)
 
 	key, err := client.CreateKey(ctx, capabilities)
 	if err != nil {
@@ -148,7 +155,7 @@ func (b *Backend) ReadConfiguration(ctx context.Context, request *logical.Reques
 	case err != nil:
 		return nil, err
 	case entry == nil:
-		return logical.ErrorResponse("configuration has not been set"), nil
+		return nil, errors.New("configuration has not been set")
 	}
 
 	var config Config
@@ -175,11 +182,11 @@ func (b *Backend) UpdateConfiguration(ctx context.Context, request *logical.Requ
 
 	switch {
 	case config.Tailnet == "":
-		return logical.ErrorResponse("provided tailnet cannot be empty"), nil
+		return nil, errors.New("provided tailnet cannot be empty")
 	case config.APIKey == "":
-		return logical.ErrorResponse("provided api_key cannot be empty"), nil
+		return nil, errors.New("provided api_key cannot be empty")
 	case config.APIUrl == "":
-		return logical.ErrorResponse("provided api_url cannot be empty"), nil
+		return nil, errors.New("provided api_url cannot be empty")
 	}
 
 	entry, err := logical.StorageEntryJSON(configPath, config)
@@ -187,5 +194,9 @@ func (b *Backend) UpdateConfiguration(ctx context.Context, request *logical.Requ
 		return nil, err
 	}
 
-	return nil, request.Storage.Put(ctx, entry)
+	if err = request.Storage.Put(ctx, entry); err != nil {
+		return nil, err
+	}
+
+	return &logical.Response{}, nil
 }

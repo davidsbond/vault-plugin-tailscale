@@ -26,6 +26,9 @@ func TestBackend_GenerateKey(t *testing.T) {
 		"preauthorized": {
 			Type: framework.TypeBool,
 		},
+		"ephemeral": {
+			Type: framework.TypeBool,
+		},
 	}
 
 	tt := []struct {
@@ -75,10 +78,11 @@ func TestBackend_GenerateKey(t *testing.T) {
 			response, err := b.GenerateKey(ctx, tc.Request, tc.Data)
 
 			if tc.ExpectsError {
-				assert.Error(t, response.Error())
+				assert.Error(t, err)
 				return
 			}
 
+			assert.NoError(t, err)
 			assert.EqualValues(t, tc.Expected, response.Data)
 		})
 	}
@@ -125,13 +129,13 @@ func TestBackend_ReadConfiguration(t *testing.T) {
 			}
 
 			response, err := b.ReadConfiguration(ctx, tc.Request, tc.Data)
-			assert.NoError(t, err)
 
 			if tc.ExpectsError {
-				assert.Error(t, response.Error())
+				assert.Error(t, err)
 				return
 			}
 
+			assert.NoError(t, err)
 			assert.EqualValues(t, tc.Expected, response.Data)
 		})
 	}
@@ -202,14 +206,14 @@ func TestBackend_UpdateConfiguration(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
-			response, err := b.UpdateConfiguration(ctx, tc.Request, tc.Data)
-			assert.NoError(t, err)
+			_, err := b.UpdateConfiguration(ctx, tc.Request, tc.Data)
 
 			if tc.ExpectsError {
-				assert.Error(t, response.Error())
+				assert.Error(t, err)
 				return
 			}
 
+			assert.NoError(t, err)
 			assert.EqualValues(t, tc.Expected, getConfig(t, ctx, tc.Request))
 		})
 	}
