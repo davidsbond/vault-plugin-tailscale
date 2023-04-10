@@ -46,6 +46,7 @@ func TestBackend_GenerateKey(t *testing.T) {
 			Config: backend.Config{
 				Tailnet: "example",
 				APIUrl:  "http://localhost:1337",
+				APIKey:  "example",
 			},
 			Data: &framework.FieldData{
 				Schema: requestSchema,
