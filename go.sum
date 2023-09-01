@@ -190,8 +190,8 @@ github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcU
 github.com/stretchr/testify v1.8.4/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXlSw2iwfAo=
 github.com/tailscale/hujson v0.0.0-20220630195928-54599719472f h1:n4r/sJ92cBSBHK8n9lR1XLFr0OiTVeGfN5TR+9LaN7E=
 github.com/tailscale/hujson v0.0.0-20220630195928-54599719472f/go.mod h1:DFSS3NAGHthKo1gTlmEcSBiZrRJXi28rLNd/1udP1c8=
-github.com/tailscale/tailscale-client-go v1.11.0 h1:rswhQaXxCoG7MXCNwzcr0hdpWnDCVr1/4To9cW/QV/8=
-github.com/tailscale/tailscale-client-go v1.11.0/go.mod h1:7s3yTFP5pcQQJOGXJLPfPLuYNX7I2h4SNbEVNSiOo/A=
+github.com/tailscale/tailscale-client-go v1.12.0 h1:Al9EpGN+hoGrVMTnNWbnoYE+Oz289AL2NyzSGhsK1ZU=
+github.com/tailscale/tailscale-client-go v1.12.0/go.mod h1:7s3yTFP5pcQQJOGXJLPfPLuYNX7I2h4SNbEVNSiOo/A=
 github.com/tv42/httpunix v0.0.0-20150427012821-b75d8614f926/go.mod h1:9ESjWnEqriFuLhtthL60Sar/7RFoluCcXsuvEwTV5KM=
 go.uber.org/atomic v1.10.0 h1:9qC72Qh0+3MqyJbAn8YU5xVq1frD8bn3JtD2oXtafVQ=
 go.uber.org/atomic v1.10.0/go.mod h1:LUxbIzbOniOlMKjJjyPfpl4v+PKK2cNJn91OQbhoJI0=
