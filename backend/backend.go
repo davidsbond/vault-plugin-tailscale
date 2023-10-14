@@ -20,11 +20,25 @@ type (
 
 	// The Config type describes the configuration fields used by the Backend
 	Config struct {
-		Tailnet string `json:"tailnet"`
-		APIKey  string `json:"api_key"`
-		APIUrl  string `json:"api_url"`
+		Tailnet           string   `json:"tailnet"`
+		APIKey            string   `json:"api_key"`
+		APIUrl            string   `json:"api_url"`
+		OAuthClientID     string   `json:"oauth_client_id"`
+		OAuthClientSecret string   `json:"oauth_client_secret"`
+		OAuthScopes       []string `json:"oauth_scopes"`
 	}
 )
+
+func (c Config) Client() (*tailscale.Client, error) {
+	if c.APIKey != "" {
+		return tailscale.NewClient(c.APIKey, c.Tailnet, tailscale.WithBaseURL(c.APIUrl))
+	}
+
+	return tailscale.NewClient("", c.Tailnet,
+		tailscale.WithBaseURL(c.APIUrl),
+		tailscale.WithOAuthClientCredentials(c.OAuthClientID, c.OAuthClientSecret, c.OAuthScopes),
+	)
+}
 
 const (
 	backendHelp              = "The Tailscale backend is used to generate Tailscale authentication keys for a configured Tailnet"
@@ -85,6 +99,15 @@ func Create(ctx context.Context, config *logical.BackendConfig) (logical.Backend
 						Description: apiUrlDescription,
 						Default:     "https://api.tailscale.com",
 					},
+					"oauth_client_id": {
+						Type: framework.TypeString,
+					},
+					"oauth_client_secret": {
+						Type: framework.TypeString,
+					},
+					"oauth_scopes": {
+						Type: framework.TypeStringSlice,
+					},
 				},
 				Operations: map[logical.Operation]framework.OperationHandler{
 					logical.ReadOperation: &framework.PathOperation{
@@ -120,7 +143,7 @@ func (b *Backend) GenerateKey(ctx context.Context, request *logical.Request, dat
 		return nil, err
 	}
 
-	client, err := tailscale.NewClient(config.APIKey, config.Tailnet, tailscale.WithBaseURL(config.APIUrl))
+	client, err := config.Client()
 	if err != nil {
 		return nil, err
 	}
@@ -165,9 +188,12 @@ func (b *Backend) ReadConfiguration(ctx context.Context, request *logical.Reques
 
 	return &logical.Response{
 		Data: map[string]interface{}{
-			"tailnet": config.Tailnet,
-			"api_key": config.APIKey,
-			"api_url": config.APIUrl,
+			"tailnet":             config.Tailnet,
+			"api_key":             config.APIKey,
+			"api_url":             config.APIUrl,
+			"oauth_client_id":     config.OAuthClientID,
+			"oauth_client_secret": config.OAuthClientSecret,
+			"oauth_scopes":        config.OAuthScopes,
 		},
 	}, nil
 }
@@ -175,16 +201,19 @@ func (b *Backend) ReadConfiguration(ctx context.Context, request *logical.Reques
 // UpdateConfiguration modifies the Backend configuration. Returns an error if any required fields are missing.
 func (b *Backend) UpdateConfiguration(ctx context.Context, request *logical.Request, data *framework.FieldData) (*logical.Response, error) {
 	config := Config{
-		Tailnet: data.Get("tailnet").(string),
-		APIKey:  data.Get("api_key").(string),
-		APIUrl:  data.Get("api_url").(string),
+		Tailnet:           data.Get("tailnet").(string),
+		APIKey:            data.Get("api_key").(string),
+		APIUrl:            data.Get("api_url").(string),
+		OAuthScopes:       data.Get("oauth_scopes").([]string),
+		OAuthClientSecret: data.Get("oauth_client_secret").(string),
+		OAuthClientID:     data.Get("oauth_client_id").(string),
 	}
 
 	switch {
 	case config.Tailnet == "":
 		return nil, errors.New("provided tailnet cannot be empty")
-	case config.APIKey == "":
-		return nil, errors.New("provided api_key cannot be empty")
+	case config.APIKey == "" && config.OAuthClientID == "":
+		return nil, errors.New("one of api_key or oauth_client_id cannot be empty")
 	case config.APIUrl == "":
 		return nil, errors.New("provided api_url cannot be empty")
 	}

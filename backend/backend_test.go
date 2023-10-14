@@ -101,7 +101,7 @@ func TestBackend_ReadConfiguration(t *testing.T) {
 		ExpectsError bool
 	}{
 		{
-			Name:    "It should read the backend configuration",
+			Name:    "It should read the backend configuration for an API key configuration",
 			Request: logical.TestRequest(t, logical.ReadOperation, "config"),
 			Config: &backend.Config{
 				Tailnet: "example.com",
@@ -109,9 +109,31 @@ func TestBackend_ReadConfiguration(t *testing.T) {
 				APIUrl:  "example.com",
 			},
 			Expected: map[string]interface{}{
-				"tailnet": "example.com",
-				"api_key": "1234",
-				"api_url": "example.com",
+				"tailnet":             "example.com",
+				"api_key":             "1234",
+				"api_url":             "example.com",
+				"oauth_client_id":     "",
+				"oauth_client_secret": "",
+				"oauth_scopes":        []string(nil),
+			},
+		},
+		{
+			Name:    "It should read the backend configuration for an oauth configuration",
+			Request: logical.TestRequest(t, logical.ReadOperation, "config"),
+			Config: &backend.Config{
+				Tailnet:           "example.com",
+				OAuthClientID:     "test",
+				OAuthClientSecret: "test",
+				OAuthScopes:       []string{"test"},
+				APIUrl:            "example.com",
+			},
+			Expected: map[string]interface{}{
+				"tailnet":             "example.com",
+				"api_url":             "example.com",
+				"api_key":             "",
+				"oauth_client_id":     "test",
+				"oauth_client_secret": "test",
+				"oauth_scopes":        []string{"test"},
 			},
 		},
 		{
@@ -156,6 +178,15 @@ func TestBackend_UpdateConfiguration(t *testing.T) {
 			Type:    framework.TypeString,
 			Default: "https://api.tailscale.com",
 		},
+		"oauth_client_id": {
+			Type: framework.TypeString,
+		},
+		"oauth_client_secret": {
+			Type: framework.TypeString,
+		},
+		"oauth_scopes": {
+			Type: framework.TypeStringSlice,
+		},
 	}
 
 	tt := []struct {
@@ -166,7 +197,7 @@ func TestBackend_UpdateConfiguration(t *testing.T) {
 		ExpectsError bool
 	}{
 		{
-			Name:    "It should update the backend configuration",
+			Name:    "It should update the backend configuration for API keys",
 			Request: logical.TestRequest(t, logical.UpdateOperation, "config"),
 			Data: &framework.FieldData{
 				Schema: requestSchema,
@@ -176,9 +207,10 @@ func TestBackend_UpdateConfiguration(t *testing.T) {
 				},
 			},
 			Expected: backend.Config{
-				Tailnet: "example.com",
-				APIKey:  "12345",
-				APIUrl:  "https://api.tailscale.com",
+				Tailnet:     "example.com",
+				APIKey:      "12345",
+				APIUrl:      "https://api.tailscale.com",
+				OAuthScopes: []string{},
 			},
 		},
 		{
